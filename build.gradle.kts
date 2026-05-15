@@ -1,6 +1,7 @@
 plugins {
     id("java-gradle-plugin")
     id("pl.allegro.tech.build.axion-release").version("1.21.1")
+    kotlin("jvm")
 }
 
 version = scmVersion.version
@@ -13,7 +14,10 @@ repositories {
     mavenCentral()
 }
 
-dependencies {}
+dependencies {
+    testImplementation(gradleTestKit())
+    testImplementation(kotlin("test"))
+}
 
 gradlePlugin {
     plugins {
@@ -22,4 +26,8 @@ gradlePlugin {
             implementationClass = "$packageName.$mainClass"
         }
     }
+}
+
+kotlin {
+    jvmToolchain(25)
 }
