@@ -1,5 +1,6 @@
 plugins {
     id("java-gradle-plugin")
+    id("maven-publish")
     id("pl.allegro.tech.build.axion-release").version("1.21.1")
     kotlin("jvm")
 }
@@ -24,6 +25,14 @@ gradlePlugin {
         register(name) {
             id = packageName
             implementationClass = "$packageName.$mainClass"
+        }
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
         }
     }
 }
