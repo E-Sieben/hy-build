@@ -88,5 +88,4 @@ jobs:
           tag_name: v${{ steps.axion.outputs.version }}
           name: Release v${{ steps.axion.outputs.version }}
           body: ${{ steps.github_release.outputs.changelog }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
