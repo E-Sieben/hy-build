@@ -32,7 +32,7 @@ jobs:
         uses: gradle/actions/wrapper-validation@v4
 
       - name: Publish plugin
-        run: ./gradlew publishPlugins
+        run: ./gradlew publish
         env:
           GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
           GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
