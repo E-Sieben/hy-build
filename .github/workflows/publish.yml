@@ -32,16 +32,8 @@ jobs:
       - name: Validate Gradle wrapper
         uses: gradle/actions/wrapper-validation@v4
 
-      - name: Validate version (manual runs only)
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          if [ -z "${{ github.event.inputs.version }}" ]; then
-            echo "Version input is required for manual runs"
-            exit 1
-          fi
-
       - name: Publish plugin
-        run: ./gradlew publishPlugins -Prelease.forceVersion=${{ github.event.release.tag_name || github.event.inputs.version }}
+        run: ./gradlew publishPlugins -Prelease.forceVersion=$(echo "${{ github.event.release.tag_name }}" | sed 's/^v//')
         env:
           GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
           GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
