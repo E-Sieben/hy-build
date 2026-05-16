@@ -12,9 +12,10 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.zip.ZipInputStream
 
-abstract class ServerDownloaderTask : DefaultTask() {
+abstract class DownloadServerDownloaderTask : DefaultTask() {
     companion object {
-        val DOWNLOADER_URL: URL = URI.create("https://downloader.hytale.com/hytale-downloader.zip").toURL()
+        val DOWNLOADER_URL: URL =
+            URI.create("https://downloader.hytale.com/hytale-downloader.zip").toURL()
         val DOWNLOADER_NAME: String =
             if (OS.isWindows) "hytale-downloader.exe" else "hytale-downloader"
     }

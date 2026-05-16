@@ -8,7 +8,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.test.*
 
-class ServerDownloaderTaskTest {
+class DownloadServerDownloaderTaskTest {
 
     private val pluginPackage: String = this::class.java.packageName.replace(".server", "")
 
@@ -41,16 +41,17 @@ class ServerDownloaderTaskTest {
     fun `task is of correct type`() {
         val project = buildProject()
         val task = project.tasks.findByName("downloadServerDownloader")
-        assertIs<ServerDownloaderTask>(task)
+        assertIs<DownloadServerDownloaderTask>(task)
     }
 
     @Test
     fun `serverDownloaderExecutable has correct default name`() {
         val project = buildProject()
-        val task = project.tasks.getByName("downloadServerDownloader") as ServerDownloaderTask
+        val task =
+            project.tasks.getByName("downloadServerDownloader") as DownloadServerDownloaderTask
         val file = task.serverDownloaderExecutable.get().asFile
         assertEquals(
-            ServerDownloaderTask.DOWNLOADER_NAME,
+            DownloadServerDownloaderTask.DOWNLOADER_NAME,
             file.name,
             "Expected output file name to match DOWNLOADER_NAME"
         )
@@ -59,7 +60,8 @@ class ServerDownloaderTaskTest {
     @Test
     fun `serverDownloaderExecutable is inside plugin folder`() {
         val project = buildProject()
-        val task = project.tasks.getByName("downloadServerDownloader") as ServerDownloaderTask
+        val task =
+            project.tasks.getByName("downloadServerDownloader") as DownloadServerDownloaderTask
         val file = task.serverDownloaderExecutable.get().asFile
         assertTrue(
             file.path.contains(HyBuild.PLUGIN_FOLDER),
@@ -71,12 +73,12 @@ class ServerDownloaderTaskTest {
     fun `DOWNLOADER_NAME ends with exe on windows or has no extension on linux`() {
         if (OS.isWindows) {
             assertTrue(
-                ServerDownloaderTask.DOWNLOADER_NAME.endsWith(".exe"),
+                DownloadServerDownloaderTask.DOWNLOADER_NAME.endsWith(".exe"),
                 "Expected DOWNLOADER_NAME to end with .exe on Windows"
             )
         } else {
             assertFalse(
-                ServerDownloaderTask.DOWNLOADER_NAME.contains("."),
+                DownloadServerDownloaderTask.DOWNLOADER_NAME.contains("."),
                 "Expected DOWNLOADER_NAME to have no extension on Linux/Mac"
             )
         }
@@ -85,7 +87,8 @@ class ServerDownloaderTaskTest {
     @Test
     fun `task skips download if executable already exists`() {
         val project = buildProject()
-        val task = project.tasks.getByName("downloadServerDownloader") as ServerDownloaderTask
+        val task =
+            project.tasks.getByName("downloadServerDownloader") as DownloadServerDownloaderTask
         val targetFile = task.serverDownloaderExecutable.get().asFile
 
         targetFile.parentFile.mkdirs()
@@ -110,7 +113,8 @@ class ServerDownloaderTaskTest {
         }
 
         val project = buildProject()
-        val task = project.tasks.getByName("downloadServerDownloader") as ServerDownloaderTask
+        val task =
+            project.tasks.getByName("downloadServerDownloader") as DownloadServerDownloaderTask
         val targetFile = task.serverDownloaderExecutable.get().asFile
         targetFile.parentFile.mkdirs()
 
@@ -139,7 +143,7 @@ class ServerDownloaderTaskTest {
 
         assertTrue(targetFile.exists(), "Expected binary to be extracted")
         assertEquals(
-            ServerDownloaderTask.DOWNLOADER_NAME,
+            DownloadServerDownloaderTask.DOWNLOADER_NAME,
             targetFile.name,
             "Extracted file must be named DOWNLOADER_NAME"
         )
@@ -156,7 +160,8 @@ class ServerDownloaderTaskTest {
         )
 
         val project = buildProject()
-        val task = project.tasks.getByName("downloadServerDownloader") as ServerDownloaderTask
+        val task =
+            project.tasks.getByName("downloadServerDownloader") as DownloadServerDownloaderTask
         val targetFile = task.serverDownloaderExecutable.get().asFile
         val outputDir = targetFile.parentFile
         outputDir.mkdirs()
@@ -189,7 +194,7 @@ class ServerDownloaderTaskTest {
         val newFiles = filesAfter - filesBefore
 
         assertEquals(
-            setOf(ServerDownloaderTask.DOWNLOADER_NAME),
+            setOf(DownloadServerDownloaderTask.DOWNLOADER_NAME),
             newFiles,
             "Only DOWNLOADER_NAME should have been written to the output directory"
         )

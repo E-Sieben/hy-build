@@ -1,6 +1,7 @@
 package net.esieben.hybuild
 
-import net.esieben.hybuild.server.ServerDownloaderTask
+import net.esieben.hybuild.server.DownloadServerDownloaderTask
+import net.esieben.hybuild.server.LaunchServerDownloaderTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -15,11 +16,31 @@ class HyBuild : Plugin<Project> {
 
     override fun apply(project: Project) {
         val logger = project.logger
-        logger.lifecycle("Hello from the $className Plugin")
+        logger.lifecycle("$className Plugin is starting")
 
-        project.tasks.register("downloadServerDownloader", ServerDownloaderTask::class.java) {
-            it.group = "hytale"
-            it.description = "Downloads and extracts the Hytale Server Downloader executable"
+
+        /// Server
+        val downloadServerDownloaderTask = project.tasks.register(
+            "downloadServerDownloader",
+            DownloadServerDownloaderTask::class.java
+        ) {
+            it.group = "hytale server"
+            it.description =
+                "Downloads and extracts the official Hytale Server Downloader executable"
         }
+        val launchServerDownloaderTask = project.tasks.register(
+            "launchServerDownloader",
+            LaunchServerDownloaderTask::class.java
+        ) {
+            it.dependsOn(downloadServerDownloaderTask)
+            it.serverDownloaderExecutable.set(
+                downloadServerDownloaderTask.flatMap { t -> t.serverDownloaderExecutable }
+            )
+            it.group = "hytale server"
+            it.description =
+                "Runs the official Hytale Server downloader, downloading Asset.zip and the server.jar"
+        }
+
+        /// Project Setups
     }
 }

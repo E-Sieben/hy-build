@@ -29,14 +29,6 @@ gradlePlugin {
     }
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-        }
-    }
-}
-
 kotlin {
     jvmToolchain(25)
 }
