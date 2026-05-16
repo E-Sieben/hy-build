@@ -29,6 +29,7 @@ gradlePlugin {
             displayName = mainClass
             description = "A Plugin made for Hytale Plugin creation, testing and releasing"
             implementationClass = "$packageName.$mainClass"
+            tags = listOf("hytale", "kotlin")
         }
     }
 }
