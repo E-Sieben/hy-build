@@ -1,6 +1,6 @@
 plugins {
     id("java-gradle-plugin")
-    id("maven-publish")
+    id("com.gradle.plugin-publish").version("2.1.1")
     id("pl.allegro.tech.build.axion-release").version("1.21.1")
     kotlin("jvm")
 }
