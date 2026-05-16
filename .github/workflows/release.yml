@@ -78,6 +78,7 @@ jobs:
         uses: mikepenz/release-changelog-builder-action@v4
         with:
           toTag: v${{ steps.axion.outputs.version }}
+          commitMode: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -88,5 +89,4 @@ jobs:
           name: Release v${{ steps.axion.outputs.version }}
           body: ${{ steps.github_release.outputs.changelog }}
         env:
-          # Use PAT_TOKEN to trigger your other "Publish Plugin" workflow
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
