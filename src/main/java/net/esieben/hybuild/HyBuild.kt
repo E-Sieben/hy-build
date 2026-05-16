@@ -1,5 +1,6 @@
 package net.esieben.hybuild
 
+import net.esieben.hybuild.project.AddHytaleFolderToGitignoreTask
 import net.esieben.hybuild.server.DownloadServerDownloaderTask
 import net.esieben.hybuild.server.LaunchServerDownloaderTask
 import org.gradle.api.Plugin
@@ -42,5 +43,12 @@ class HyBuild : Plugin<Project> {
         }
 
         /// Project Setups
+        project.tasks.register(
+            "addHytaleFolderToGitignore",
+            AddHytaleFolderToGitignoreTask::class.java
+        ) {
+            it.group = "hytale project"
+            it.description = "Adds the .hytale folder to your gitignore file"
+        }
     }
 }
