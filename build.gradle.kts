@@ -21,6 +21,8 @@ dependencies {
 }
 
 gradlePlugin {
+    website = "https://github.com/E-Sieben/hy-build"
+    vcsUrl = "https://github.com/E-Sieben/hy-build.git"
     plugins {
         register(name) {
             id = packageName
