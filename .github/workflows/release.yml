@@ -1,0 +1,92 @@
+name: Auto Release
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Tag and Release
+    runs-on: ubuntu-latest
+    if: "!startsWith(github.ref, 'refs/tags/')"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.5.1'
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git
+
+      - name: Determine Version Bump
+        id: bump
+        run: |
+          # Find the last tag. If none exists, get all commits.
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          
+          if [ -z "$LAST_TAG" ]; then
+            COMMITS=$(git log --format="%s%n%b")
+          else
+            COMMITS=$(git log ${LAST_TAG}..HEAD --format="%s%n%b")
+          fi
+          
+          # Default to patch
+          BUMP="incrementPatch"
+          
+          # Check for major: "BREAKING CHANGE" in body OR "!:" in header (e.g., feat!:)
+          if echo "$COMMITS" | grep -qE "BREAKING CHANGE|^[a-zA-Z]+(\([^)]+\))?!:"; then
+            BUMP="incrementMajor"
+          # Check for minor: "feat:" or "feat(scope):" in header
+          elif echo "$COMMITS" | grep -qE "^feat(\([^)]+\))?:"; then
+            BUMP="incrementMinor"
+          fi
+          
+          echo "Determined bump type: $BUMP"
+          echo "incrementer=$BUMP" >> $GITHUB_OUTPUT
+
+      - name: Create and Push Tag via Axion
+        id: axion
+        run: |
+          # Pass the dynamic incrementer from the previous step directly to Axion
+          ./gradlew release -Prelease.versionIncrementer=${{ steps.bump.outputs.incrementer }} -x test
+          
+          # Extract the new raw version number 
+          VERSION=$(./gradlew currentVersion -q -Prelease.quiet)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build Changelog
+        id: github_release
+        uses: mikepenz/release-changelog-builder-action@v4
+        with:
+          toTag: v${{ steps.axion.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.axion.outputs.version }}
+          name: Release v${{ steps.axion.outputs.version }}
+          body: ${{ steps.github_release.outputs.changelog }}
+        env:
+          # Use PAT_TOKEN to trigger your other "Publish Plugin" workflow
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
