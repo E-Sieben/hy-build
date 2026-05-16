@@ -24,6 +24,8 @@ gradlePlugin {
     plugins {
         register(name) {
             id = packageName
+            displayName = mainClass
+            description = "A Plugin made for Hytale Plugin creation, testing and releasing"
             implementationClass = "$packageName.$mainClass"
         }
     }
