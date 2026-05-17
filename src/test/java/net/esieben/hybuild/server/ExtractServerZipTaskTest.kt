@@ -69,19 +69,17 @@ class ExtractServerZipTaskTest {
     }
 
     @Test
-    fun `skips extraction when all server files are already present`() {
+    fun `overwrites existing files so an updated version zip is never ignored`() {
         // Arrange
         val (task, hytaleDir) = setup()
-        createVersionZip(hytaleDir)
-        File(hytaleDir, "HytaleServer.jar").writeText("existing")
-        File(hytaleDir, "HytaleServer.aot").writeText("existing")
-        File(hytaleDir, "Assets.zip").writeText("existing")
+        File(hytaleDir, "HytaleServer.jar").writeText("old-version")
+        createVersionZip(hytaleDir) // zip contains "fake-jar" as new content
 
         // Act
         task.extractServerZip()
 
-        // Assert — existing files are not overwritten
-        assertEquals(File(hytaleDir, "HytaleServer.jar").readText(), "existing")
+        // Assert — old content is replaced by whatever is in the current zip
+        assertEquals("fake-jar", File(hytaleDir, "HytaleServer.jar").readText())
     }
 
     @Test

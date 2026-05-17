@@ -33,14 +33,6 @@ abstract class ExtractServerZipTask : DefaultTask() {
             ?.firstOrNull { it.isFile && it.name.matches(VERSION_ZIP_PATTERN) }
             ?: error("No server version ZIP found in ${folder.absolutePath}. Run launchServerDownloader first.")
 
-        val serverJar = folder.resolve("HytaleServer.jar")
-        val serverAot = folder.resolve("HytaleServer.aot")
-        val assetsZip = folder.resolve("Assets.zip")
-        if (serverJar.exists() && serverAot.exists() && assetsZip.exists()) {
-            logger.lifecycle("All server files already present, skipping extraction.")
-            return
-        }
-
         logger.lifecycle("Extracting server files from '${versionZip.name}'")
 
         ZipInputStream(versionZip.inputStream()).use { zip ->
