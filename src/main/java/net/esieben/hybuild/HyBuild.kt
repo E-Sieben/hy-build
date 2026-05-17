@@ -124,7 +124,8 @@ class HyBuild : Plugin<Project> {
             "initializeProject", InitializeProjectTask::class.java
         ) {
             it.dependsOn(
-                createManifestTask, project.tasks.named("extractServerZip")
+                project.tasks.named("extractServerZip"),
+                createManifestTask
             )
             it.authors.convention(extension.authors)
             it.pluginDescription.convention(extension.description)
