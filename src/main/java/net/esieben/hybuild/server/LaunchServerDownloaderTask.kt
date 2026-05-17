@@ -16,10 +16,6 @@ abstract class LaunchServerDownloaderTask : DefaultTask() {
     fun launchDownloader() {
         val executable = serverDownloaderExecutable.get().asFile
 
-        check(executable.exists()) {
-            "Hytale Downloader binary not found at ${executable.absolutePath}."
-        }
-
         if (!OS.isWindows) {
             executable.setExecutable(true)
         }
@@ -35,11 +31,10 @@ abstract class LaunchServerDownloaderTask : DefaultTask() {
 
         logger.lifecycle("Launching Hytale Downloader")
 
-        val processBuilder = ProcessBuilder(executable.absolutePath)
+        val process = ProcessBuilder(executable.absolutePath)
             .directory(executable.parentFile)
             .redirectErrorStream(true)
-
-        val process = processBuilder.start()
+            .start()
 
         val outputPump = Thread {
             process.inputStream.bufferedReader().forEachLine { line ->

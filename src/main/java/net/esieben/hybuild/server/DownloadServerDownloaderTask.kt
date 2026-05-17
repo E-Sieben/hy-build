@@ -29,9 +29,6 @@ abstract class DownloadServerDownloaderTask : DefaultTask() {
         )
     }
 
-    /**
-     * Downloads the official Hytale Downloader if not present
-     */
     @TaskAction
     fun downloadServerDownloader() {
         val targetExecutable = serverDownloaderExecutable.get().asFile

@@ -12,10 +12,12 @@ var mainClass: String =
     name.split("-").joinToString("") { it.replaceFirstChar { char -> char.uppercase() } }
 
 repositories {
+    gradlePluginPortal()
     mavenCentral()
 }
 
 dependencies {
+    implementation("io.freefair.gradle:lombok-plugin:latest.release")
     testImplementation(gradleTestKit())
     testImplementation(kotlin("test"))
 }
