@@ -2,10 +2,10 @@ package net.esieben.hybuild.server
 
 import net.esieben.hybuild.util.OS
 import org.gradle.api.DefaultTask
-import java.io.File
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
+import java.io.File
 
 abstract class LaunchServerDownloaderTask : DefaultTask() {
 

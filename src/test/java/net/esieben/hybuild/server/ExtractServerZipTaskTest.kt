@@ -63,7 +63,10 @@ class ExtractServerZipTaskTest {
             "1.2.3-abc123.zip",
             "0.0.1-build.zip",
         ).forEach { name ->
-            assertTrue(name.matches(ExtractServerZipTask.VERSION_ZIP_PATTERN), "'$name' should match")
+            assertTrue(
+                name.matches(ExtractServerZipTask.VERSION_ZIP_PATTERN),
+                "'$name' should match"
+            )
         }
     }
 
@@ -75,7 +78,10 @@ class ExtractServerZipTaskTest {
             "1.2.3.zip",
             "random.zip",
         ).forEach { name ->
-            assertFalse(name.matches(ExtractServerZipTask.VERSION_ZIP_PATTERN), "'$name' should not match")
+            assertFalse(
+                name.matches(ExtractServerZipTask.VERSION_ZIP_PATTERN),
+                "'$name' should not match"
+            )
         }
     }
 
@@ -84,7 +90,8 @@ class ExtractServerZipTaskTest {
     @Test
     fun `extractServerZip extracts all three server files`() {
         val dir = tempDir()
-        writeVersionZip(dir,
+        writeVersionZip(
+            dir,
             "Asset.zip" to "asset-data",
             "Server/HytaleServer.jar" to "jar-data",
             "Server/HytaleServer.aot" to "aot-data",
@@ -95,14 +102,15 @@ class ExtractServerZipTaskTest {
         task.extractServerZip()
 
         assertEquals("asset-data", dir.resolve("Asset.zip").readText())
-        assertEquals("jar-data",   dir.resolve("HytaleServer.jar").readText())
-        assertEquals("aot-data",   dir.resolve("HytaleServer.aot").readText())
+        assertEquals("jar-data", dir.resolve("HytaleServer.jar").readText())
+        assertEquals("aot-data", dir.resolve("HytaleServer.aot").readText())
     }
 
     @Test
     fun `extractServerZip strips subdirectory prefix when naming extracted files`() {
         val dir = tempDir()
-        writeVersionZip(dir,
+        writeVersionZip(
+            dir,
             "Server/HytaleServer.jar" to "jar-data",
             "Server/HytaleServer.aot" to "aot-data",
             "Asset.zip" to "asset-data",
@@ -112,14 +120,18 @@ class ExtractServerZipTaskTest {
         task.hytaleFolder.set(dir)
         task.extractServerZip()
 
-        assertTrue(dir.resolve("HytaleServer.jar").exists(), "HytaleServer.jar should be extracted flat")
+        assertTrue(
+            dir.resolve("HytaleServer.jar").exists(),
+            "HytaleServer.jar should be extracted flat"
+        )
         assertFalse(dir.resolve("Server").exists(), "Server/ subdirectory should not be created")
     }
 
     @Test
     fun `extractServerZip skips unrecognised zip entries`() {
         val dir = tempDir()
-        writeVersionZip(dir,
+        writeVersionZip(
+            dir,
             "Asset.zip" to "asset-data",
             "Unknown/readme.txt" to "readme",
         )
@@ -145,8 +157,8 @@ class ExtractServerZipTaskTest {
         task.hytaleFolder.set(dir)
         task.extractServerZip()
 
-        assertTrue(versionZip.exists(),   "Version zip must not be deleted")
-        assertTrue(credentials.exists(),  "Credentials JSON must not be deleted")
+        assertTrue(versionZip.exists(), "Version zip must not be deleted")
+        assertTrue(credentials.exists(), "Credentials JSON must not be deleted")
     }
 
     // ── Error handling ────────────────────────────────────────────────────────

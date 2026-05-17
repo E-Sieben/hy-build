@@ -34,7 +34,13 @@ abstract class RunServerTask : DefaultTask() {
         val serverDir = folder.resolve("server")
         serverDir.mkdirs()
 
-        val command = listOf(javaExecutable, "-jar", serverJar.absolutePath, "--assets", assetsZip.absolutePath)
+        val command = listOf(
+            javaExecutable,
+            "-jar",
+            serverJar.absolutePath,
+            "--assets",
+            assetsZip.absolutePath
+        )
 
         if (launchInTerminal(serverDir, command)) {
             logger.lifecycle("Hytale Server launched in a new terminal window.")
@@ -48,17 +54,17 @@ abstract class RunServerTask : DefaultTask() {
 
     private fun launchInTerminal(workingDir: File, command: List<String>): Boolean = when {
         OS.isWindows -> launchWindows(workingDir, command)
-        OS.isMac     -> launchMac(workingDir, command)
+        OS.isMac -> launchMac(workingDir, command)
         OS.hasDisplay -> launchLinux(workingDir, command)
-        else         -> false
+        else -> false
     }
 
     private fun launchWindows(workingDir: File, command: List<String>): Boolean {
         val script = workingDir.resolve("start-server.bat")
         script.writeText(
             "@echo off\r\n" +
-            command.joinToString(" ") { "\"$it\"" } + "\r\n" +
-            "echo.\r\npause\r\n"
+                    command.joinToString(" ") { "\"$it\"" } + "\r\n" +
+                    "echo.\r\npause\r\n"
         )
         return runCatching {
             ProcessBuilder("cmd", "/c", "start", "cmd", "/k", script.absolutePath)
@@ -99,7 +105,11 @@ abstract class RunServerTask : DefaultTask() {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private fun writeUnixScript(workingDir: File, command: List<String>, waitOnExit: Boolean): File {
+    private fun writeUnixScript(
+        workingDir: File,
+        command: List<String>,
+        waitOnExit: Boolean
+    ): File {
         val script = workingDir.resolve("start-server.sh")
         val cmdLine = command.joinToString(" ") { unixQuote(it) }
         script.writeText(buildString {
