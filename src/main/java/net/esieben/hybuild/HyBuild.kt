@@ -2,7 +2,9 @@ package net.esieben.hybuild
 
 import net.esieben.hybuild.project.AddHytaleFolderToGitignoreTask
 import net.esieben.hybuild.server.DownloadServerDownloaderTask
+import net.esieben.hybuild.server.ExtractServerZipTask
 import net.esieben.hybuild.server.LaunchServerDownloaderTask
+import net.esieben.hybuild.server.RunServerTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -39,7 +41,25 @@ class HyBuild : Plugin<Project> {
             )
             it.group = "hytale server"
             it.description =
-                "Runs the official Hytale Server downloader, downloading Asset.zip and the server.jar"
+                "Runs the official Hytale Server Downloader, fetching the server version package"
+        }
+        val extractServerZipTask = project.tasks.register(
+            "extractServerZip",
+            ExtractServerZipTask::class.java
+        ) {
+            it.dependsOn(launchServerDownloaderTask)
+            it.group = "hytale server"
+            it.description =
+                "Extracts HytaleServer.jar, HytaleServer.aot and Assets.zip from the downloaded version package"
+        }
+        project.tasks.register(
+            "runServer",
+            RunServerTask::class.java
+        ) {
+            it.dependsOn(extractServerZipTask)
+            it.group = "hytale server"
+            it.description =
+                "Starts the Hytale Server, downloading and extracting server files first if needed"
         }
 
         /// Project Setups

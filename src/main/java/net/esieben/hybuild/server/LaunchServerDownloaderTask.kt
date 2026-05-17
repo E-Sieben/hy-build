@@ -2,6 +2,7 @@ package net.esieben.hybuild.server
 
 import net.esieben.hybuild.util.OS
 import org.gradle.api.DefaultTask
+import java.io.File
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
@@ -21,6 +22,15 @@ abstract class LaunchServerDownloaderTask : DefaultTask() {
 
         if (!OS.isWindows) {
             executable.setExecutable(true)
+        }
+
+        val targetVersion = printVersion(executable)
+        if (targetVersion != null) {
+            val versionZip = executable.parentFile.resolve("$targetVersion.zip")
+            if (versionZip.exists()) {
+                logger.lifecycle("Server version '$targetVersion' already downloaded, skipping.")
+                return
+            }
         }
 
         logger.lifecycle("Launching Hytale Downloader")
@@ -46,4 +56,13 @@ abstract class LaunchServerDownloaderTask : DefaultTask() {
 
         logger.lifecycle("Hytale Downloader completed successfully.")
     }
+
+    private fun printVersion(executable: File): String? = runCatching {
+        val process = ProcessBuilder(executable.absolutePath, "-print-version")
+            .directory(executable.parentFile)
+            .start()
+        val version = process.inputStream.bufferedReader().readText().trim()
+        process.waitFor()
+        version.ifBlank { null }
+    }.getOrNull()
 }
