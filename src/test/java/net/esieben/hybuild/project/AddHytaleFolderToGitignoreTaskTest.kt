@@ -13,7 +13,10 @@ class AddHytaleFolderToGitignoreTaskTest {
     private fun setup(): Pair<File, AddHytaleFolderToGitignoreTask> {
         val projectDir = Files.createTempDirectory("hy-build-test").toFile()
         val project = ProjectBuilder.builder().withProjectDir(projectDir).build()
-        val task = project.tasks.register("addHytaleFolderToGitignore", AddHytaleFolderToGitignoreTask::class.java).get()
+        val task = project.tasks.register(
+            "addHytaleFolderToGitignore",
+            AddHytaleFolderToGitignoreTask::class.java
+        ).get()
         return projectDir to task
     }
 

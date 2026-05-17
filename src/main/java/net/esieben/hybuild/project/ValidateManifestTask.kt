@@ -27,7 +27,9 @@ abstract class ValidateManifestTask : DefaultTask() {
         val errors = mutableListOf<String>()
 
         listOf("Group", "Name", "Version", "Main", "ServerVersion").forEach { field ->
-            if (manifest[field]?.toString().isNullOrBlank()) errors += "Missing required field: $field"
+            if (manifest[field]?.toString()
+                    .isNullOrBlank()
+            ) errors += "Missing required field: $field"
         }
 
         val authors = manifest["Authors"]
@@ -37,7 +39,9 @@ abstract class ValidateManifestTask : DefaultTask() {
             else -> {
                 @Suppress("UNCHECKED_CAST")
                 (authors as List<Map<String, Any?>>).forEachIndexed { i, author ->
-                    if (author["Name"]?.toString().isNullOrBlank()) errors += "Authors[$i].Name is required"
+                    if (author["Name"]?.toString()
+                            .isNullOrBlank()
+                    ) errors += "Authors[$i].Name is required"
                 }
             }
         }

@@ -9,7 +9,7 @@ abstract class CreateManifestTask : AbstractManifestTask() {
     fun createManifest() {
         warnIfOptionalMissing()
 
-        val manifest = buildMap<String, Any> {
+        val manifest = buildMap {
             put("Group", project.group.toString())
             put("Name", project.name)
             put("Version", project.version.toString())

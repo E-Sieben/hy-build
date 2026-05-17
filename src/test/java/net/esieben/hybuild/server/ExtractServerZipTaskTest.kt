@@ -6,11 +6,7 @@ import java.io.File
 import java.nio.file.Files
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class ExtractServerZipTaskTest {
 
@@ -18,7 +14,8 @@ class ExtractServerZipTaskTest {
         val projectDir = Files.createTempDirectory("hy-build-test").toFile()
         val hytaleDir = File(projectDir, HyBuild.PLUGIN_FOLDER).also { it.mkdirs() }
         val project = ProjectBuilder.builder().withProjectDir(projectDir).build()
-        val task = project.tasks.register("extractServerZip", ExtractServerZipTask::class.java).get()
+        val task =
+            project.tasks.register("extractServerZip", ExtractServerZipTask::class.java).get()
         return task to hytaleDir
     }
 

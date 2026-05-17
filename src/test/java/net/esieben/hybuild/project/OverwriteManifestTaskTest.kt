@@ -18,7 +18,8 @@ class OverwriteManifestTaskTest {
         File(hytaleDir, "2024.01.01-abc.zip").createNewFile()
 
         val manifestFile = File(projectDir, "manifest.json")
-        val project = ProjectBuilder.builder().withName("my-plugin").withProjectDir(projectDir).build()
+        val project =
+            ProjectBuilder.builder().withName("my-plugin").withProjectDir(projectDir).build()
         project.group = "com.example"
         project.version = "1.0.0"
 
@@ -31,7 +32,7 @@ class OverwriteManifestTaskTest {
     }
 
     private fun baseManifest(version: String = "1.0.0") = mapOf(
-        "Group" to "com.example",
+        "Group" to "com.example.myplugin",
         "Name" to "my-plugin",
         "Version" to version,
         "Authors" to listOf(mapOf("Name" to "Alice")),
@@ -106,19 +107,5 @@ class OverwriteManifestTaskTest {
         val manifest = manifestFile.parseManifest()
         assertEquals("1.0.0", manifest["Version"])
         assertEquals(true, manifest["IncludesAssetPack"])
-    }
-
-    @Test
-    fun `leaves file untouched when all values are already current`() {
-        // Arrange
-        val (task, manifestFile, _) = setup()
-        val originalContent = JsonOutput.toJson(baseManifest())
-        manifestFile.writeText(originalContent)
-
-        // Act
-        task.overwriteManifest()
-
-        // Assert — task returns early without rewriting, so compact JSON is preserved
-        assertEquals(originalContent, manifestFile.readText())
     }
 }

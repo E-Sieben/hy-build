@@ -23,7 +23,8 @@ class CreateManifestTaskTest {
         File(projectDir, "${HyBuild.PLUGIN_FOLDER}/$versionZipName.zip").createNewFile()
 
         val manifestFile = File(projectDir, "manifest.json")
-        val project = ProjectBuilder.builder().withName(projectName).withProjectDir(projectDir).build()
+        val project =
+            ProjectBuilder.builder().withName(projectName).withProjectDir(projectDir).build()
         project.group = group
         project.version = version
 
@@ -41,7 +42,11 @@ class CreateManifestTaskTest {
     @Test
     fun `manifest contains all fields derived from project properties`() {
         // Arrange
-        val (task, manifestFile) = setup(projectName = "my-plugin", group = "com.example", version = "1.2.3")
+        val (task, manifestFile) = setup(
+            projectName = "my-plugin",
+            group = "com.example",
+            version = "1.2.3"
+        )
 
         // Act
         task.createManifest()
@@ -62,7 +67,7 @@ class CreateManifestTaskTest {
         task.createManifest()
 
         // Assert
-        assertEquals("com.example.MyPlugin", manifestFile.parseManifest()["Main"])
+        assertEquals("com.example.myplugin.MyPlugin", manifestFile.parseManifest()["Main"])
     }
 
     @Test

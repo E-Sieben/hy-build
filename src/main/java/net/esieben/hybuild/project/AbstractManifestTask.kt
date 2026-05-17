@@ -10,7 +10,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputFile
 
 abstract class AbstractManifestTask : DefaultTask() {
 
@@ -43,11 +42,16 @@ abstract class AbstractManifestTask : DefaultTask() {
         if (!website.isPresent) logger.lifecycle(MISSING_WEBSITE_MSG)
     }
 
-    protected fun deriveMainClass(): String {
+    fun deriveMainClassName(): String {
         val className = project.rootProject.name
             .split("-")
             .joinToString("") { it.replaceFirstChar(Char::uppercaseChar) }
-        return "${project.group}.$className"
+        return className
+    }
+
+    protected fun deriveMainClass(): String {
+        val className = deriveMainClassName()
+        return "${project.group}.${className.lowercase()}.$className"
     }
 
     protected fun resolveServerVersion(): String {

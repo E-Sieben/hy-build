@@ -35,11 +35,20 @@ class HyBuildTest {
         val project = projectWithPlugin()
 
         // Assert
-        listOf("downloadServerDownloader", "launchServerDownloader", "extractServerZip", "runServer")
+        listOf(
+            "downloadServerDownloader",
+            "launchServerDownloader",
+            "extractServerZip",
+            "runServer"
+        )
             .forEach { name ->
                 val task = project.tasks.findByName(name)
                 assertNotNull(task, "Expected task '$name' to be registered")
-                assertEquals("hytale server", task.group, "Task '$name' should be in 'hytale server' group")
+                assertEquals(
+                    "hytale server",
+                    task.group,
+                    "Task '$name' should be in 'hytale server' group"
+                )
             }
     }
 
@@ -49,11 +58,20 @@ class HyBuildTest {
         val project = projectWithPlugin()
 
         // Assert
-        listOf("addHytaleFolderToGitignore", "createManifest", "validateManifest", "overwriteManifest")
+        listOf(
+            "addHytaleFolderToGitignore",
+            "createManifest",
+            "validateManifest",
+            "overwriteManifest"
+        )
             .forEach { name ->
                 val task = project.tasks.findByName(name)
                 assertNotNull(task, "Expected task '$name' to be registered")
-                assertEquals("hytale project", task.group, "Task '$name' should be in 'hytale project' group")
+                assertEquals(
+                    "hytale project",
+                    task.group,
+                    "Task '$name' should be in 'hytale project' group"
+                )
             }
     }
 

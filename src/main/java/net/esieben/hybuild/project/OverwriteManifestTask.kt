@@ -20,7 +20,7 @@ abstract class OverwriteManifestTask : AbstractManifestTask() {
         }
 
         val authorsList = authors.get()
-        val desired = buildMap<String, Any> {
+        val desired = buildMap {
             put("Group", project.group.toString())
             put("Name", project.name)
             put("Version", project.version.toString())
