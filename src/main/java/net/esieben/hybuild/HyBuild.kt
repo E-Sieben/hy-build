@@ -123,10 +123,9 @@ class HyBuild : Plugin<Project> {
         project.tasks.register(
             "initializeProject", InitializeProjectTask::class.java
         ) {
-            it.dependsOn(
-                project.tasks.named("extractServerZip"),
-                createManifestTask
-            )
+            val extractServerZipTask = project.tasks.named("extractServerZip")
+            createManifestTask.configure { t -> t.mustRunAfter(extractServerZipTask) }
+            it.dependsOn(extractServerZipTask, createManifestTask)
             it.authors.convention(extension.authors)
             it.pluginDescription.convention(extension.description)
             it.website.convention(extension.website)
