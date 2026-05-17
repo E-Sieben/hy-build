@@ -120,11 +120,12 @@ class HyBuild : Plugin<Project> {
                 "Updates only changed fields in the existing manifest.json, preserving manually added fields"
         }
 
+        val extractServerZipTask = project.tasks.named("extractServerZip")
+        createManifestTask.configure { t -> t.mustRunAfter(extractServerZipTask) }
+
         project.tasks.register(
             "initializeProject", InitializeProjectTask::class.java
         ) {
-            val extractServerZipTask = project.tasks.named("extractServerZip")
-            createManifestTask.configure { t -> t.mustRunAfter(extractServerZipTask) }
             it.dependsOn(extractServerZipTask, createManifestTask)
             it.authors.convention(extension.authors)
             it.pluginDescription.convention(extension.description)
