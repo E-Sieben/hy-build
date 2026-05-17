@@ -3,12 +3,12 @@ package net.esieben.hybuild.project
 import groovy.json.JsonSlurper
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
 abstract class ValidateManifestTask : DefaultTask() {
 
-    @get:InputFile
+    @get:Internal
     abstract val manifestFile: RegularFileProperty
 
     init {

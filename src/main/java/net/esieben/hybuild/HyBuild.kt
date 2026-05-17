@@ -44,7 +44,7 @@ class HyBuild : Plugin<Project> {
             it.description = "Adds the .hytale folder to your gitignore file"
         }
 
-        val createManifestTask = project.tasks.register(
+        project.tasks.register(
             "createManifest",
             CreateManifestTask::class.java
         ) {
@@ -52,37 +52,32 @@ class HyBuild : Plugin<Project> {
             it.pluginDescription.convention(extension.description)
             it.website.convention(extension.website)
             it.group = "hytale project"
-            it.description = "Generates manifest.json for the Hytale plugin"
+            it.description = "Generates a fresh manifest.json, replacing all content including any manually added fields"
         }
 
         val validateManifestTask = project.tasks.register(
             "validateManifest",
             ValidateManifestTask::class.java
         ) {
-            it.dependsOn(createManifestTask)
-            it.manifestFile.set(createManifestTask.flatMap { t -> t.manifestFile })
             it.group = "hytale project"
             it.description = "Validates the plugin manifest.json against the Hytale manifest schema"
         }
 
-        createManifestTask.configure { it.finalizedBy(validateManifestTask) }
-
-        project.tasks.register(
+        val overwriteManifestTask = project.tasks.register(
             "overwriteManifest",
             OverwriteManifestTask::class.java
         ) {
             it.authors.convention(extension.authors)
             it.pluginDescription.convention(extension.description)
             it.website.convention(extension.website)
-            it.manifestFile.convention(createManifestTask.flatMap { t -> t.manifestFile })
             it.finalizedBy(validateManifestTask)
             it.group = "hytale project"
-            it.description = "Updates only changed fields in the existing manifest.json"
+            it.description = "Updates only changed fields in the existing manifest.json, preserving manually added fields"
         }
 
         project.plugins.withId("java") {
-            project.tasks.named("processResources") { it.dependsOn(createManifestTask) }
-            project.tasks.named("check") { it.dependsOn(validateManifestTask) }
+            project.tasks.named("processResources") { it.dependsOn(overwriteManifestTask) }
+            project.tasks.named("check") { it.dependsOn(overwriteManifestTask) }
         }
     }
 

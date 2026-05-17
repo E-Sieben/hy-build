@@ -90,6 +90,25 @@ class OverwriteManifestTaskTest {
     }
 
     @Test
+    fun `preserves manually added fields when a managed field changes`() {
+        // Arrange
+        val (task, manifestFile, _) = setup()
+        manifestFile.writeText(
+            JsonOutput.toJson(
+                baseManifest(version = "0.9.0") + mapOf("IncludesAssetPack" to true)
+            )
+        )
+
+        // Act
+        task.overwriteManifest() // version bumps from 0.9.0 to 1.0.0, forcing a rewrite
+
+        // Assert — IncludesAssetPack must survive even when the file is rewritten
+        val manifest = manifestFile.parseManifest()
+        assertEquals("1.0.0", manifest["Version"])
+        assertEquals(true, manifest["IncludesAssetPack"])
+    }
+
+    @Test
     fun `leaves file untouched when all values are already current`() {
         // Arrange
         val (task, manifestFile, _) = setup()

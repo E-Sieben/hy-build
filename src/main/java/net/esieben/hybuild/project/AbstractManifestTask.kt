@@ -28,7 +28,7 @@ abstract class AbstractManifestTask : DefaultTask() {
     @get:Optional
     abstract val website: Property<String>
 
-    @get:OutputFile
+    @get:Internal
     abstract val manifestFile: RegularFileProperty
 
     init {
