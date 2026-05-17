@@ -19,7 +19,7 @@ abstract class InitializeProjectTask : AbstractManifestTask() {
             /**
              * Main entry point for ${project.name}.
              * <p>
-             * ${if (pluginDescription.isPresent) pluginDescription else "Please add a description here"}
+             * ${pluginDescription.getOrElse("Please add a description here")}
              *
              * @author ${project.group}
              * @since ${LocalDate.now()}
