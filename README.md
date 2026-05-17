@@ -143,13 +143,8 @@ doesn't exist and is idempotent — safe to run multiple times.
 A typical first-time setup looks like this:
 
 ```
-./gradlew addHytaleFolderToGitignore
-./gradlew createManifest
-./gradlew runServer
+./gradlew initializeProject
 ```
-
-and then creating your Main class at the location specified in the Manifest.json, extending
-JavaPlugin
 
 `runServer` downloads everything it needs automatically. Once the server has been downloaded once,
 subsequent runs skip straight to launching.
