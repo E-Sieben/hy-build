@@ -83,7 +83,7 @@ class HyBuild : Plugin<Project> {
 
         val extension = project.extensions.create("hytale", HyBuildExtension::class.java)
 
-        project.tasks.register(
+        val addHytaleFolderToGitignoreTask = project.tasks.register(
             "addHytaleFolderToGitignore", AddHytaleFolderToGitignoreTask::class.java
         ) {
             it.group = hytaleProjectGroup
@@ -126,7 +126,7 @@ class HyBuild : Plugin<Project> {
         project.tasks.register(
             "initializeProject", InitializeProjectTask::class.java
         ) {
-            it.dependsOn(extractServerZipTask, createManifestTask)
+            it.dependsOn(extractServerZipTask, createManifestTask, addHytaleFolderToGitignoreTask)
             it.authors.convention(extension.authors)
             it.pluginDescription.convention(extension.description)
             it.website.convention(extension.website)
