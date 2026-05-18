@@ -52,6 +52,8 @@ without you having to generate or host anything yourself.
 To opt out, set `includeAIJavadoc = false` in your `hytale` block. The server jar is still added to
 your compile classpath; you just won't get hover documentation.
 
+*Disclaimer*: AI is often wrong and inaccurate. The initial Run was a Batch Task of 941 individual
+Runs with no Context blend. Consequent runs are performed via differential package sized bytes
 
 ## Tasks
 
@@ -217,3 +219,17 @@ hytale {
 
 That's it. `Main` is derived as `com.example.YourPlugin` and `ServerVersion` is read from the
 downloaded server zip automatically.
+
+
+# Roadmap
+*Planned*:
+- Linux, Mac and Windows dedicated Integration Test Suite via Github Runners
+- Dedicated Pre-Release Pipeline
+- Easy Version Management probably via Google's Release Please
+- Server Error detection
+
+*Not planned*:
+- Release of the AI Flow to document the Source Code
+  - (AI is a plight upon Humanity and the Moment we get *proper* accessible Human documented code this feature
+  will be flagged as deprecated)
+- Dynamic Links to hytalemodding.dev
