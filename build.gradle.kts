@@ -7,6 +7,7 @@ plugins {
 
 version = scmVersion.version
 group = "net.esieben"
+
 var packageName: String = "$group.${name.replace("-", "")}"
 var mainClass: String =
     name.split("-").joinToString("") { it.replaceFirstChar { char -> char.uppercase() } }
