@@ -14,7 +14,9 @@ plugins {
 ```
 
 The plugin automatically applies [Lombok](https://projectlombok.org/) and adds `HytaleServer.jar` as
-a `compileOnly` dependency whenever the `java` plugin is present.
+a `compileOnly` dependency whenever the `java` plugin is present. AI-generated Javadoc is attached to
+`HytaleServer.jar` by default, so hovering over any Hytale API in your IDE shows documentation.
+([Click here to disable](https://github.com/E-Sieben/hy-build#ai-javadoc))
 
 ## Configuration
 
@@ -25,9 +27,9 @@ hytale {
   authors = listOf("Your Name")
   description = "What your plugin does"   // optional
   website = "https://github.com/you/repo" // optional
+  includeAIJavadoc = false                // optional, default: true
 }
 ```
-
 The `Group`, `Name`, `Version`, `Main`, and `ServerVersion` fields in the manifest are derived
 automatically from your Gradle project — you only need to supply what Gradle doesn't already know.
 
@@ -40,6 +42,16 @@ automatically from your Gradle project — you only need to supply what Gradle d
 | `ServerVersion` | Filename of the version zip inside `.hytale/` (without extension) |
 
 ---
+
+### AI Javadoc
+
+By default, the plugin attaches an AI-generated sources jar to `HytaleServer.jar`. This gives your
+IDE enough information to show documentation when you hover over Hytale API classes and methods —
+without you having to generate or host anything yourself.
+
+To opt out, set `includeAIJavadoc = false` in your `hytale` block. The server jar is still added to
+your compile classpath; you just won't get hover documentation.
+
 
 ## Tasks
 
@@ -169,6 +181,7 @@ your-plugin/
 │   ├── hytale-downloader        # the official downloader binary
 │   ├── 2024.06.15-deadbeef.zip  # downloaded server version package
 │   ├── HytaleServer.jar
+│   ├── HytaleServer-sources.jar # extracted automatically, provides IDE hover docs
 │   ├── HytaleServer.aot
 │   ├── Assets.zip
 │   └── server/

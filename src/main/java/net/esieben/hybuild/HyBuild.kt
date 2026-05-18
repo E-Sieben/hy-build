@@ -18,14 +18,15 @@ class HyBuild : Plugin<Project> {
     override fun apply(project: Project) {
         project.logger.lifecycle("${this::class.java.simpleName} Plugin is starting")
 
+        val extension = project.extensions.create("hytale", HyBuildExtension::class.java)
+        extension.includeAIJavadoc.convention(true)
+
         registerServerTasks(project)
-        registerProjectTasks(project)
+        registerProjectTasks(project, extension)
 
         project.plugins.withId("java") {
             project.plugins.apply("io.freefair.lombok")
-            project.dependencies.add(
-                "compileOnly", project.files("$PLUGIN_FOLDER/HytaleServer.jar")
-            )
+            project.afterEvaluate { HytaleClasspath.setup(project, extension) }
         }
     }
 
@@ -78,10 +79,8 @@ class HyBuild : Plugin<Project> {
         }
     }
 
-    private fun registerProjectTasks(project: Project) {
+    private fun registerProjectTasks(project: Project, extension: HyBuildExtension) {
         val hytaleProjectGroup = "hytale project"
-
-        val extension = project.extensions.create("hytale", HyBuildExtension::class.java)
 
         val addHytaleFolderToGitignoreTask = project.tasks.register(
             "addHytaleFolderToGitignore", AddHytaleFolderToGitignoreTask::class.java

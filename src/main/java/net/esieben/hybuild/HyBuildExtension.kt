@@ -7,4 +7,5 @@ abstract class HyBuildExtension {
     abstract val authors: ListProperty<String>
     abstract val description: Property<String>
     abstract val website: Property<String>
+    abstract val includeAIJavadoc: Property<Boolean>
 }

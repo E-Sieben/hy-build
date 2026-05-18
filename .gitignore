@@ -41,3 +41,10 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Secrets ###
+.env
+scripts/.env
+
+### Local Helpers ###
+scripts/
