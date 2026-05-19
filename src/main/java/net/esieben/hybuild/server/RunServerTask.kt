@@ -127,7 +127,7 @@ abstract class RunServerTask : DefaultTask() {
         val script = workingDir.resolve("start-server.sh")
         val cmdLine = command.joinToString(" ") { unixQuote(it) }
         script.writeText(buildString {
-            appendLine("#!/bin/bash")
+            appendLine("#!/usr/bin/env bash")
             appendLine(cmdLine)
             if (waitOnExit) appendLine("read -p 'Server stopped. Press Enter to close...'")
         })
@@ -153,8 +153,8 @@ abstract class RunServerTask : DefaultTask() {
         }.also { it.isDaemon = true; it.start() }
 
         val exit = process.waitFor()
-        stdoutPump.join()
-        stderrPump.join()
+        stdoutPump.join(5_000)
+        stderrPump.join(5_000)
         logger.lifecycle("Hytale Server exited with code $exit.")
     }
 

@@ -3,7 +3,8 @@ package net.esieben.hybuild.server
 import net.esieben.hybuild.HyBuild
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.nio.file.Files
@@ -16,7 +17,8 @@ abstract class ExtractServerZipTask : DefaultTask() {
         val VERSION_ZIP_PATTERN = Regex("""\d+\.\d+\.\d+-.+\.zip""")
     }
 
-    @get:Internal
+    @get:InputDirectory
+    @get:Optional
     abstract val hytaleFolder: DirectoryProperty
 
     init {

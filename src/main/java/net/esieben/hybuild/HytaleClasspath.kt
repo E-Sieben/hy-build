@@ -71,8 +71,8 @@ internal object HytaleClasspath {
         val targetSources = File(artifactDir, "$HYTALE_ARTIFACT-$version-sources.jar")
         val targetPom     = File(artifactDir, "$HYTALE_ARTIFACT-$version.pom")
 
-        if (!targetJar.exists()     || targetJar.length()     != jar.length())        jar.copyTo(targetJar,     overwrite = true)
-        if (!targetSources.exists() || targetSources.length() != sourcesJar.length()) sourcesJar.copyTo(targetSources, overwrite = true)
+        jar.copyTo(targetJar, overwrite = true)
+        sourcesJar.copyTo(targetSources, overwrite = true)
         if (!targetPom.exists()) targetPom.writeText(buildPom(version))
     }
 

@@ -2,12 +2,18 @@ package net.esieben.hybuild.project
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 abstract class OverwriteManifestTask : AbstractManifestTask() {
 
+    @get:OutputFile
+    abstract override val manifestFile: RegularFileProperty
+
     @TaskAction
     fun overwriteManifest() {
+        validateProjectCoordinates()
         warnIfOptionalMissing()
 
         val file = manifestFile.get().asFile

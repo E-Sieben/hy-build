@@ -35,11 +35,6 @@ abstract class DownloadServerDownloaderTask : DefaultTask() {
         val outputDir = targetExecutable.parentFile
         outputDir.mkdirs()
 
-        if (targetExecutable.exists()) {
-            logger.lifecycle("Hytale Server Downloader already present at ${targetExecutable.absolutePath}")
-            return
-        }
-
         logger.lifecycle("Downloading and extracting Hytale Server Downloader...")
 
         DOWNLOADER_URL.openStream().use { webStream ->

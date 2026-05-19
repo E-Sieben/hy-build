@@ -1,12 +1,18 @@
 package net.esieben.hybuild.project
 
 import groovy.json.JsonOutput
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 abstract class CreateManifestTask : AbstractManifestTask() {
 
+    @get:OutputFile
+    abstract override val manifestFile: RegularFileProperty
+
     @TaskAction
     fun createManifest() {
+        validateProjectCoordinates()
         warnIfOptionalMissing()
 
         val manifest = buildMap {

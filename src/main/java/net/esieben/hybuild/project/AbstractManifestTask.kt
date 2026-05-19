@@ -8,12 +8,14 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 
 abstract class AbstractManifestTask : DefaultTask() {
 
-    @get:Internal
+    @get:InputDirectory
+    @get:Optional
     abstract val hytaleFolder: DirectoryProperty
 
     @get:Input
@@ -35,6 +37,16 @@ abstract class AbstractManifestTask : DefaultTask() {
         manifestFile.convention(
             project.layout.projectDirectory.file("src/main/resources/manifest.json")
         )
+    }
+
+    protected fun validateProjectCoordinates() {
+        check(project.group.toString().isNotBlank()) {
+            "project.group is not set. Add 'group = \"com.example\"' to build.gradle.kts."
+        }
+        val version = project.version.toString()
+        check(version.isNotBlank() && version != "unspecified") {
+            "project.version is not set. Add 'version = \"1.0.0\"' to build.gradle.kts."
+        }
     }
 
     protected fun warnIfOptionalMissing() {

@@ -6,6 +6,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 abstract class LaunchServerDownloaderTask : DefaultTask() {
 
@@ -42,8 +43,12 @@ abstract class LaunchServerDownloaderTask : DefaultTask() {
                 lines += line
             }
         }.also { it.isDaemon = true; it.start() }
-        val exit = process.waitFor()
-        pump.join()
-        return exit to lines
+        val completed = process.waitFor(20, TimeUnit.MINUTES)
+        if (!completed) {
+            process.destroyForcibly()
+            error("Process '${executable.name}' timed out after 10 minutes")
+        }
+        pump.join(30_000)
+        return process.exitValue() to lines
     }
 }
