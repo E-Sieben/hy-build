@@ -1,7 +1,10 @@
+import org.gradle.plugin.compatibility.compatibility
+
 plugins {
     id("java-gradle-plugin")
     id("com.gradle.plugin-publish").version("2.1.1")
     id("pl.allegro.tech.build.axion-release").version("1.21.1")
+    id("org.gradle.plugin-compatibility").version("1.0.0")
     kotlin("jvm")
 }
 
@@ -29,10 +32,17 @@ gradlePlugin {
     plugins {
         register(name) {
             id = packageName
+            implementationClass = "$packageName.$mainClass"
+            // Plugin Portal Information
             displayName = mainClass
             description = "A Plugin made for Hytale Plugin creation, testing and releasing"
-            implementationClass = "$packageName.$mainClass"
-            tags = listOf("hytale", "kotlin")
+            tags = listOf("hytale", "kotlin", "tooling", "automation")
+
+            compatibility {
+                features {
+                    configurationCache = true
+                }
+            }
         }
     }
 }
