@@ -30,7 +30,8 @@ abstract class ExtractServerZipTask : DefaultTask() {
         val folder = hytaleFolder.get().asFile
 
         val versionZip = folder.listFiles()
-            ?.firstOrNull { it.isFile && it.name.matches(VERSION_ZIP_PATTERN) }
+            ?.filter { it.isFile && it.name.matches(VERSION_ZIP_PATTERN) }
+            ?.maxByOrNull { it.name }
             ?: error("No server version ZIP found in ${folder.absolutePath}. Run launchServerDownloader first.")
 
         logger.lifecycle("Extracting server files from '${versionZip.name}'")

@@ -23,6 +23,13 @@ internal object HytaleClasspath {
                 project.dependencies.add("compileOnly", "$HYTALE_GROUP:$HYTALE_ARTIFACT:$version")
                 return
             }
+            // .hytale files not ready yet — fall back to any version already in Maven Local
+            val existingVersion = detectMavenLocalVersion()
+            if (existingVersion != null) {
+                project.repositories.mavenLocal()
+                project.dependencies.add("compileOnly", "$HYTALE_GROUP:$HYTALE_ARTIFACT:$existingVersion")
+                return
+            }
         }
 
         project.dependencies.add("compileOnly", project.files(mainJar))
@@ -38,8 +45,20 @@ internal object HytaleClasspath {
 
     private fun detectServerVersion(hytaleDir: File): String? =
         hytaleDir.listFiles()
-            ?.firstOrNull { it.isFile && it.name.matches(VERSION_ZIP_PATTERN) }
+            ?.filter { it.isFile && it.name.matches(VERSION_ZIP_PATTERN) }
+            ?.maxByOrNull { it.name }
             ?.nameWithoutExtension
+
+    private fun detectMavenLocalVersion(): String? {
+        val artifactDir = File(
+            System.getProperty("user.home"),
+            ".m2/repository/${HYTALE_GROUP.replace('.', '/')}/$HYTALE_ARTIFACT"
+        )
+        return artifactDir.listFiles()
+            ?.filter { it.isDirectory }
+            ?.maxByOrNull { it.lastModified() }
+            ?.name
+    }
 
     private fun installToMavenLocal(jar: File, sourcesJar: File, version: String) {
         val artifactDir = File(
