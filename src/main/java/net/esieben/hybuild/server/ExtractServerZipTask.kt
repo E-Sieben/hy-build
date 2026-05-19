@@ -3,8 +3,9 @@ package net.esieben.hybuild.server
 import net.esieben.hybuild.HyBuild
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Optional
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.nio.file.Files
@@ -17,14 +18,25 @@ abstract class ExtractServerZipTask : DefaultTask() {
         val VERSION_ZIP_PATTERN = Regex("""\d+\.\d+\.\d+-.+\.zip""")
     }
 
-    @get:InputDirectory
-    @get:Optional
+    @get:Internal
     abstract val hytaleFolder: DirectoryProperty
+
+    @get:OutputFile
+    abstract val serverJar: RegularFileProperty
+
+    @get:OutputFile
+    abstract val serverAot: RegularFileProperty
+
+    @get:OutputFile
+    abstract val assetsZip: RegularFileProperty
 
     init {
         hytaleFolder.convention(
             project.layout.projectDirectory.dir(HyBuild.PLUGIN_FOLDER)
         )
+        serverJar.convention(hytaleFolder.file("HytaleServer.jar"))
+        serverAot.convention(hytaleFolder.file("HytaleServer.aot"))
+        assetsZip.convention(hytaleFolder.file("Assets.zip"))
     }
 
     @TaskAction
@@ -43,10 +55,10 @@ abstract class ExtractServerZipTask : DefaultTask() {
             while (entry != null) {
                 if (!entry.isDirectory) {
                     val target: File? = when (File(entry.name).name) {
-                        "Assets.zip" -> folder.resolve("Assets.zip")
-                        "HytaleServer.jar" -> folder.resolve("HytaleServer.jar")
-                        "HytaleServer.aot" -> folder.resolve("HytaleServer.aot")
-                        else -> null
+                        "Assets.zip"       -> assetsZip.get().asFile
+                        "HytaleServer.jar" -> serverJar.get().asFile
+                        "HytaleServer.aot" -> serverAot.get().asFile
+                        else               -> null
                     }
                     if (target != null) {
                         logger.lifecycle("  Extracting '${entry.name}' → '${target.name}'")
