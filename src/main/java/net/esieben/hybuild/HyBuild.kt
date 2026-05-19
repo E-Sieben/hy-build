@@ -8,6 +8,7 @@ import net.esieben.hybuild.server.RunServerTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Jar
+import java.io.File
 
 class HyBuild : Plugin<Project> {
 
@@ -26,7 +27,7 @@ class HyBuild : Plugin<Project> {
 
         project.plugins.withId("java") {
             project.plugins.apply("io.freefair.lombok")
-            project.afterEvaluate { HytaleClasspath.setup(project, extension) }
+            setupHytaleClasspath(project, extension)
         }
     }
 
@@ -136,6 +137,56 @@ class HyBuild : Plugin<Project> {
         project.plugins.withId("java") {
             project.tasks.named("processResources") { it.dependsOn(overwriteManifestTask) }
             project.tasks.named("check") { it.dependsOn(overwriteManifestTask) }
+        }
+    }
+
+    private fun setupHytaleClasspath(project: Project, extension: HyBuildExtension) {
+        val hytaleDir = project.layout.projectDirectory.dir(PLUGIN_FOLDER)
+
+        val versionProvider = project.providers.of(HytaleVersionSource::class.java) {
+            it.parameters.hytaleFolder.set(hytaleDir)
+        }
+
+        project.tasks.register("prepareHytaleClasspath", PrepareHytaleClasspathTask::class.java) {
+            it.group = "hytale project"
+            it.description =
+                "Extracts the AI-generated sources JAR and installs Hytale Server to Maven Local"
+            it.includeAIJavadoc.set(extension.includeAIJavadoc)
+            it.version.set(versionProvider)
+            it.serverJar.set(hytaleDir.file("HytaleServer.jar"))
+            it.extractedSourcesJar.set(hytaleDir.file("HytaleServer-sources.jar"))
+            it.mavenLocalArtifactDir.set(
+                project.layout.dir(
+                versionProvider.map { ver ->
+                    File(
+                        System.getProperty("user.home"),
+                        ".m2/repository/${
+                            HytaleVersionSource.HYTALE_GROUP.replace(
+                                '.',
+                                '/'
+                            )
+                        }/${HytaleVersionSource.HYTALE_ARTIFACT}/$ver"
+                    )
+                }))
+        }
+
+        project.tasks.named("compileJava") { it.dependsOn(project.tasks.named("prepareHytaleClasspath")) }
+
+        project.repositories.mavenLocal()
+
+        project.configurations.getByName("compileOnly").withDependencies { deps ->
+            val javadoc = extension.includeAIJavadoc.get()
+            val ver = versionProvider.orNull
+
+            if (javadoc && !ver.isNullOrBlank()) {
+                deps.add(
+                    project.dependencies.create(
+                        "${HytaleVersionSource.HYTALE_GROUP}:${HytaleVersionSource.HYTALE_ARTIFACT}:$ver"
+                    )
+                )
+            } else {
+                deps.add(project.dependencies.create(project.files(hytaleDir.file("HytaleServer.jar"))))
+            }
         }
     }
 }
