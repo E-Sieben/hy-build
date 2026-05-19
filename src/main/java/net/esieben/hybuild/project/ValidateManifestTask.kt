@@ -3,12 +3,12 @@ package net.esieben.hybuild.project
 import groovy.json.JsonSlurper
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
 
 abstract class ValidateManifestTask : DefaultTask() {
 
-    @get:Internal
+    @get:InputFile
     abstract val manifestFile: RegularFileProperty
 
     init {
@@ -20,6 +20,9 @@ abstract class ValidateManifestTask : DefaultTask() {
     @TaskAction
     fun validateManifest() {
         val file = manifestFile.get().asFile
+        check(file.exists()) {
+            "manifest.json not found at '${file.absolutePath}'. Run createManifest first."
+        }
 
         @Suppress("UNCHECKED_CAST")
         val manifest = JsonSlurper().parse(file) as Map<String, Any?>

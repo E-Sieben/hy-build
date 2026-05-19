@@ -75,9 +75,11 @@ abstract class InitializeProjectTask : AbstractManifestTask() {
         val mainClassFile = project.layout.projectDirectory.dir(
             "src/main/java/${deriveMainClass().replace(".", "/")}.java"
         ).asFile
-        if (!mainClassFile.exists()) {
-            mainClassFile.parentFile.mkdirs()
+        if (mainClassFile.exists()) {
+            logger.lifecycle("Main class already exists at '${mainClassFile.absolutePath}', skipping.")
+            return
         }
+        mainClassFile.parentFile.mkdirs()
         mainClassFile.writeText(classContent)
 
         logger.lifecycle("Generated custom Main class at: ${mainClassFile.absolutePath}")

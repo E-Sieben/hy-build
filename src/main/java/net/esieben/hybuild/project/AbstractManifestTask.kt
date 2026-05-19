@@ -57,7 +57,8 @@ abstract class AbstractManifestTask : DefaultTask() {
     protected fun resolveServerVersion(): String {
         val folder = hytaleFolder.get().asFile
         return folder.listFiles()
-            ?.firstOrNull { it.isFile && it.name.matches(ExtractServerZipTask.VERSION_ZIP_PATTERN) }
+            ?.filter { it.isFile && it.name.matches(ExtractServerZipTask.VERSION_ZIP_PATTERN) }
+            ?.maxByOrNull { it.name }
             ?.nameWithoutExtension
             ?: error(
                 "No server version ZIP found in '${folder.absolutePath}'. " +
