@@ -64,7 +64,12 @@ class HyBuild : Plugin<Project> {
         val runServerTask = project.tasks.register(
             "runServer", RunServerTask::class.java
         ) {
-            it.dependsOn(extractServerZipTask)
+            it.dependsOn(project.provider {
+                val folder = project.layout.projectDirectory.dir(PLUGIN_FOLDER).asFile
+                val filesExist = listOf("HytaleServer.jar", "HytaleServer.aot", "Assets.zip")
+                    .all { name -> folder.resolve(name).exists() }
+                if (filesExist) emptyList<Any>() else listOf(extractServerZipTask)
+            })
             it.group = hytaleServerGroup
             it.description =
                 "Starts the Hytale Server, downloading and extracting server files first if needed"

@@ -223,7 +223,7 @@ downloaded server zip automatically.
 
 # Roadmap
 *Planned*:
-- Linux, Mac and Windows dedicated Integration Test Suite via Github Runners
+- Linux, Mac and Windows dedicated Integration Test Suite via GitHub Runners
 - Dedicated Pre-Release Pipeline
 - Easy Version Management probably via Google's Release Please
 - Server Error detection
