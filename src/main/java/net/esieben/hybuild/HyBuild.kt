@@ -76,6 +76,7 @@ class HyBuild : Plugin<Project> {
             runServerTask.configure {
                 it.dependsOn(jarTask)
                 it.pluginJar.set(jarTask.flatMap { t -> t.archiveFile })
+                it.pluginBaseName.set(jarTask.flatMap { t -> t.archiveBaseName })
             }
         }
     }

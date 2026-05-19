@@ -5,6 +5,8 @@ import net.esieben.hybuild.util.OS
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
@@ -19,6 +21,10 @@ abstract class RunServerTask : DefaultTask() {
     @get:InputFile
     @get:Optional
     abstract val pluginJar: RegularFileProperty
+
+    @get:Input
+    @get:Optional
+    abstract val pluginBaseName: Property<String>
 
     init {
         hytaleFolder.convention(
@@ -44,6 +50,11 @@ abstract class RunServerTask : DefaultTask() {
         val modsDir = serverDir.resolve("mods")
         modsDir.mkdirs()
         pluginJar.orNull?.asFile?.let { jar ->
+            val baseName = pluginBaseName.orNull
+            if (baseName != null) {
+                modsDir.listFiles { f -> f.extension == "jar" && f.nameWithoutExtension.startsWith("$baseName-") }
+                    ?.forEach { it.delete() }
+            }
             logger.lifecycle("Deploying '${jar.name}' → mods/")
             jar.copyTo(modsDir.resolve(jar.name), overwrite = true)
         }
