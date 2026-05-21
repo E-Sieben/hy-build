@@ -3,7 +3,7 @@ package net.esieben.hybuild.project
 import net.esieben.hybuild.HyBuild
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -14,7 +14,7 @@ abstract class AddHytaleFolderToGitignoreTask : DefaultTask() {
         const val BLOCK_TO_APPEND = "\n$SECTION_HEADER\n${HyBuild.PLUGIN_FOLDER}\n"
     }
 
-    @get:Internal
+    @get:OutputFile
     abstract val gitignoreFile: RegularFileProperty
 
     init {

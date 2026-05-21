@@ -72,7 +72,7 @@ abstract class InitializeProjectTask : AbstractManifestTask() {
             }
         """.trimIndent()
 
-        val mainClassFile = project.layout.projectDirectory.dir(
+        val mainClassFile = project.layout.projectDirectory.file(
             "src/main/java/${deriveMainClass().replace(".", "/")}.java"
         ).asFile
         if (mainClassFile.exists()) {

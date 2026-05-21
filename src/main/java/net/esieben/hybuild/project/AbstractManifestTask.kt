@@ -8,15 +8,17 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 
 abstract class AbstractManifestTask : DefaultTask() {
 
-    @get:InputDirectory
-    @get:Optional
+    @get:Internal
     abstract val hytaleFolder: DirectoryProperty
+
+    @get:Input
+    @get:Optional
+    abstract val serverVersion: Property<String>
 
     @get:Input
     abstract val authors: ListProperty<String>
@@ -67,6 +69,8 @@ abstract class AbstractManifestTask : DefaultTask() {
     }
 
     protected fun resolveServerVersion(): String {
+        serverVersion.orNull?.takeIf { it.isNotBlank() }?.let { return it }
+
         val folder = hytaleFolder.get().asFile
         return folder.listFiles()
             ?.filter { it.isFile && it.name.matches(ExtractServerZipTask.VERSION_ZIP_PATTERN) }

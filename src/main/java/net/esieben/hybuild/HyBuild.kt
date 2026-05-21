@@ -7,6 +7,8 @@ import net.esieben.hybuild.server.LaunchServerDownloaderTask
 import net.esieben.hybuild.server.RunServerTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Jar
 import java.io.File
 
@@ -22,12 +24,17 @@ class HyBuild : Plugin<Project> {
         val extension = project.extensions.create("hytale", HyBuildExtension::class.java)
         extension.includeAIJavadoc.convention(true)
 
+        val hytaleDir = project.layout.projectDirectory.dir(PLUGIN_FOLDER)
+        val versionProvider = project.providers.of(HytaleVersionSource::class.java) {
+            it.parameters.hytaleFolder.set(hytaleDir)
+        }
+
         registerServerTasks(project)
-        registerProjectTasks(project, extension)
+        registerProjectTasks(project, extension, versionProvider)
 
         project.plugins.withId("java") {
             project.plugins.apply("io.freefair.lombok")
-            setupHytaleClasspath(project, extension)
+            setupHytaleClasspath(project, extension, hytaleDir, versionProvider)
         }
     }
 
@@ -81,7 +88,7 @@ class HyBuild : Plugin<Project> {
         }
     }
 
-    private fun registerProjectTasks(project: Project, extension: HyBuildExtension) {
+    private fun registerProjectTasks(project: Project, extension: HyBuildExtension, versionProvider: Provider<String>) {
         val hytaleProjectGroup = "hytale project"
 
         val addHytaleFolderToGitignoreTask = project.tasks.register(
@@ -97,6 +104,7 @@ class HyBuild : Plugin<Project> {
             it.authors.convention(extension.authors)
             it.pluginDescription.convention(extension.description)
             it.website.convention(extension.website)
+            it.serverVersion.set(versionProvider)
             it.group = hytaleProjectGroup
             it.description =
                 "Generates a fresh manifest.json, replacing all content including any manually added fields"
@@ -115,6 +123,7 @@ class HyBuild : Plugin<Project> {
             it.authors.convention(extension.authors)
             it.pluginDescription.convention(extension.description)
             it.website.convention(extension.website)
+            it.serverVersion.set(versionProvider)
             it.finalizedBy(validateManifestTask)
             it.group = hytaleProjectGroup
             it.description =
@@ -141,13 +150,7 @@ class HyBuild : Plugin<Project> {
         }
     }
 
-    private fun setupHytaleClasspath(project: Project, extension: HyBuildExtension) {
-        val hytaleDir = project.layout.projectDirectory.dir(PLUGIN_FOLDER)
-
-        val versionProvider = project.providers.of(HytaleVersionSource::class.java) {
-            it.parameters.hytaleFolder.set(hytaleDir)
-        }
-
+    private fun setupHytaleClasspath(project: Project, extension: HyBuildExtension, hytaleDir: Directory, versionProvider: Provider<String>) {
         val extractServerZipTask = project.tasks.named("extractServerZip", ExtractServerZipTask::class.java)
 
         project.tasks.register("prepareHytaleClasspath", PrepareHytaleClasspathTask::class.java) {

@@ -27,7 +27,7 @@ abstract class PrepareHytaleClasspathTask : DefaultTask() {
     abstract val mavenLocalArtifactDir: DirectoryProperty
 
     init {
-        onlyIf("AI Javadoc is disabled") { includeAIJavadoc.get() }
+        onlyIf("AI Javadoc is enabled") { includeAIJavadoc.get() }
     }
 
     @TaskAction

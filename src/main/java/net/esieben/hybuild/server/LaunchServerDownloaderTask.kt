@@ -46,7 +46,7 @@ abstract class LaunchServerDownloaderTask : DefaultTask() {
         val completed = process.waitFor(20, TimeUnit.MINUTES)
         if (!completed) {
             process.destroyForcibly()
-            error("Process '${executable.name}' timed out after 10 minutes")
+            error("Process '${executable.name}' timed out after 20 minutes")
         }
         pump.join(30_000)
         return process.exitValue() to lines
