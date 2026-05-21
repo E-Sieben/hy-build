@@ -21,7 +21,7 @@ abstract class PrepareHytaleClasspathTask : DefaultTask() {
     abstract val serverJar: RegularFileProperty
 
     @get:OutputFile
-    abstract val extractedSourcesJar: RegularFileProperty
+    abstract val extractedJavadocJar: RegularFileProperty
 
     @get:OutputDirectory
     abstract val mavenLocalArtifactDir: DirectoryProperty
@@ -44,32 +44,32 @@ abstract class PrepareHytaleClasspathTask : DefaultTask() {
             return
         }
 
-        val sourcesJar = extractedSourcesJar.get().asFile
-        extractBundledSourcesJar(sourcesJar)
-        if (!sourcesJar.exists()) {
-            logger.lifecycle("PrepareHytaleClasspath: bundled sources JAR not available — skipping Maven Local install.")
+        val javadocJar = extractedJavadocJar.get().asFile
+        extractBundledJavadocJar(javadocJar)
+        if (!javadocJar.exists()) {
+            logger.lifecycle("PrepareHytaleClasspath: bundled javadoc JAR not available — skipping Maven Local install.")
             return
         }
 
-        installToMavenLocal(jar, sourcesJar, ver)
+        installToMavenLocal(jar, javadocJar, ver)
         logger.lifecycle("PrepareHytaleClasspath: installed $ver to Maven Local.")
     }
 
-    private fun extractBundledSourcesJar(dest: File) {
+    private fun extractBundledJavadocJar(dest: File) {
         if (dest.exists()) return
         val stream =
-            PrepareHytaleClasspathTask::class.java.getResourceAsStream("/HytaleServer-sources.jar")
+            PrepareHytaleClasspathTask::class.java.getResourceAsStream("/HytaleServer-javadoc.jar")
                 ?: return
         stream.use { input -> dest.outputStream().use { output -> input.copyTo(output) } }
     }
 
-    private fun installToMavenLocal(jar: File, sourcesJar: File, version: String) {
+    private fun installToMavenLocal(jar: File, javadocJar: File, version: String) {
         val artifactDir = mavenLocalArtifactDir.get().asFile
         artifactDir.mkdirs()
 
         val artifact = HytaleVersionSource.HYTALE_ARTIFACT
         jar.copyTo(File(artifactDir, "$artifact-$version.jar"), overwrite = true)
-        sourcesJar.copyTo(File(artifactDir, "$artifact-$version-sources.jar"), overwrite = true)
+        javadocJar.copyTo(File(artifactDir, "$artifact-$version-javadoc.jar"), overwrite = true)
 
         val pom = File(artifactDir, "$artifact-$version.pom")
         if (!pom.exists()) pom.writeText(buildPom(version))

@@ -151,11 +151,11 @@ class HyBuild : Plugin<Project> {
         project.tasks.register("prepareHytaleClasspath", PrepareHytaleClasspathTask::class.java) {
             it.group = "hytale project"
             it.description =
-                "Extracts the AI-generated sources JAR and installs Hytale Server to Maven Local"
+                "Extracts the AI-generated javadoc JAR and installs Hytale Server to Maven Local"
             it.includeAIJavadoc.set(extension.includeAIJavadoc)
             it.version.set(versionProvider)
             it.serverJar.set(hytaleDir.file("HytaleServer.jar"))
-            it.extractedSourcesJar.set(hytaleDir.file("HytaleServer-sources.jar"))
+            it.extractedJavadocJar.set(hytaleDir.file("HytaleServer-javadoc.jar"))
             it.mavenLocalArtifactDir.set(
                 project.layout.dir(
                 versionProvider.map { ver ->
