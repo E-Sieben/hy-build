@@ -12,6 +12,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 abstract class RunServerTask : DefaultTask() {
 
@@ -109,12 +110,16 @@ abstract class RunServerTask : DefaultTask() {
     private fun launchLinux(workingDir: File, command: List<String>): Boolean {
         val script = writeUnixScript(workingDir, command, waitOnExit = true)
 
-        // Try terminals in order of preference; stop at the first one found
+        // Try terminals in order of preference; stop at the first one that opens successfully.
+        // ptyxis is listed first — it is the default GNOME terminal on Ubuntu 24.04+.
+        // x-terminal-emulator points to the system default (often ptyxis on modern Ubuntu),
+        // but its accepted flags vary, so we try named terminals explicitly first.
         val terminals = listOf(
-            listOf("x-terminal-emulator", "-e", script.absolutePath),
+            listOf("ptyxis", "--", script.absolutePath),
             listOf("gnome-terminal", "--", script.absolutePath),
+            listOf("x-terminal-emulator", "--", script.absolutePath),
             listOf("konsole", "-e", script.absolutePath),
-            listOf("xfce4-terminal", "--", script.absolutePath),
+            listOf("xfce4-terminal", "-e", script.absolutePath),
             listOf("xterm", "-e", script.absolutePath),
         )
         return terminals.any { args ->
@@ -122,7 +127,12 @@ abstract class RunServerTask : DefaultTask() {
                 val found = ProcessBuilder("which", args[0])
                     .redirectErrorStream(true).start().waitFor() == 0
                 if (!found) return@runCatching false
-                ProcessBuilder(args).directory(workingDir).start()
+                val process = ProcessBuilder(args).directory(workingDir).start()
+                // If the process exits immediately with a non-zero code the terminal rejected
+                // the arguments (e.g. ptyxis receiving -e). Treat that as a failed attempt.
+                if (process.waitFor(500, TimeUnit.MILLISECONDS) && process.exitValue() != 0) {
+                    return@runCatching false
+                }
                 true
             }.getOrDefault(false)
         }
