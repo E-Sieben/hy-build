@@ -148,13 +148,15 @@ class HyBuild : Plugin<Project> {
             it.parameters.hytaleFolder.set(hytaleDir)
         }
 
+        val extractServerZipTask = project.tasks.named("extractServerZip", ExtractServerZipTask::class.java)
+
         project.tasks.register("prepareHytaleClasspath", PrepareHytaleClasspathTask::class.java) {
             it.group = "hytale project"
             it.description =
                 "Extracts the AI-generated javadoc JAR and installs Hytale Server to Maven Local"
             it.includeAIJavadoc.set(extension.includeAIJavadoc)
             it.version.set(versionProvider)
-            it.serverJar.set(hytaleDir.file("HytaleServer.jar"))
+            it.serverJar.set(extractServerZipTask.flatMap { t -> t.serverJar })
             it.extractedJavadocJar.set(hytaleDir.file("HytaleServer-javadoc.jar"))
             it.mavenLocalArtifactDir.set(
                 project.layout.dir(
