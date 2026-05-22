@@ -8,7 +8,7 @@ plugins {
     kotlin("jvm")
 }
 
-version = "1.3.0"
+version = scmVersion.version
 group = "net.esieben"
 
 var packageName: String = "$group.${name.replace("-", "")}"
