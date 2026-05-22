@@ -11,6 +11,7 @@ import org.gradle.api.file.Directory
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.plugins.ide.idea.model.IdeaModel
 import java.io.File
 
 class HyBuild : Plugin<Project> {
@@ -215,6 +216,11 @@ class HyBuild : Plugin<Project> {
             project.tasks.named("compileJava") { it.dependsOn(project.tasks.named("prepareHytaleClasspath")) }
 
             project.repositories.mavenLocal()
+
+            project.plugins.apply("idea")
+            project.extensions.configure(IdeaModel::class.java) { ideaModel ->
+                ideaModel.module { it.isDownloadJavadoc = true }
+            }
 
             project.configurations.getByName("compileOnly").withDependencies { deps ->
                 val javadoc = extension.includeAIJavadoc.get()
