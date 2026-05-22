@@ -77,6 +77,9 @@ abstract class PrepareHytaleClasspathTask : DefaultTask() {
 
         val pom = File(artifactDir, "$artifact-$version.pom")
         if (!pom.exists()) pom.writeText(buildPom(version))
+
+        val module = File(artifactDir, "$artifact-$version.module")
+        if (!module.exists()) module.writeText(buildModuleMetadata(version))
     }
 
     private fun buildPom(version: String) = """<?xml version="1.0" encoding="UTF-8"?>
@@ -87,4 +90,41 @@ abstract class PrepareHytaleClasspathTask : DefaultTask() {
   <version>$version</version>
   <packaging>jar</packaging>
 </project>"""
+
+    private fun buildModuleMetadata(version: String): String {
+        val group = HytaleVersionSource.HYTALE_GROUP
+        val artifact = HytaleVersionSource.HYTALE_ARTIFACT
+        return """{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "$group",
+    "module": "$artifact",
+    "version": "$version"
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        { "name": "$artifact-$version.jar", "url": "$artifact-$version.jar" }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        { "name": "$artifact-$version-javadoc.jar", "url": "$artifact-$version-javadoc.jar" }
+      ]
+    }
+  ]
+}"""
+    }
 }
