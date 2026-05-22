@@ -8,6 +8,7 @@ import net.esieben.hybuild.server.RunServerTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Jar
 import java.io.File
@@ -31,11 +32,8 @@ class HyBuild : Plugin<Project> {
 
         registerServerTasks(project)
         registerProjectTasks(project, extension, versionProvider)
-
-        project.plugins.withId("java") {
-            project.plugins.apply("io.freefair.lombok")
-            setupHytaleClasspath(project, extension, hytaleDir, versionProvider)
-        }
+        registerHytaleClasspath(project, extension, hytaleDir, versionProvider)
+        registerBundledSources(project)
     }
 
     private fun registerServerTasks(project: Project) {
@@ -88,7 +86,11 @@ class HyBuild : Plugin<Project> {
         }
     }
 
-    private fun registerProjectTasks(project: Project, extension: HyBuildExtension, versionProvider: Provider<String>) {
+    private fun registerProjectTasks(
+        project: Project,
+        extension: HyBuildExtension,
+        versionProvider: Provider<String>
+    ) {
         val hytaleProjectGroup = "hytale project"
 
         val addHytaleFolderToGitignoreTask = project.tasks.register(
@@ -150,48 +152,83 @@ class HyBuild : Plugin<Project> {
         }
     }
 
-    private fun setupHytaleClasspath(project: Project, extension: HyBuildExtension, hytaleDir: Directory, versionProvider: Provider<String>) {
-        val extractServerZipTask = project.tasks.named("extractServerZip", ExtractServerZipTask::class.java)
+    private fun registerBundledSources(project: Project) {
+        project.plugins.withId("java") {
+            val extractTask = project.tasks.register(
+                "extractBundledSources",
+                ExtractBundledSourcesTask::class.java
+            ) {
+                it.group = "hytale project"
+                it.description =
+                    "Extracts bundled helper sources from the plugin into build/generated-sources/hybuild"
+                it.bundles.set(listOf("codec-sources"))
+                it.outputDirectory.set(project.layout.buildDirectory.dir("generated-sources/hybuild"))
+            }
 
-        project.tasks.register("prepareHytaleClasspath", PrepareHytaleClasspathTask::class.java) {
-            it.group = "hytale project"
-            it.description =
-                "Extracts the AI-generated javadoc JAR and installs Hytale Server to Maven Local"
-            it.includeAIJavadoc.set(extension.includeAIJavadoc)
-            it.version.set(versionProvider)
-            it.serverJar.set(extractServerZipTask.flatMap { t -> t.serverJar })
-            it.extractedJavadocJar.set(hytaleDir.file("HytaleServer-javadoc.jar"))
-            it.mavenLocalArtifactDir.set(
-                project.layout.dir(
-                versionProvider.map { ver ->
-                    File(
-                        System.getProperty("user.home"),
-                        ".m2/repository/${
-                            HytaleVersionSource.HYTALE_GROUP.replace(
-                                '.',
-                                '/'
-                            )
-                        }/${HytaleVersionSource.HYTALE_ARTIFACT}/$ver"
-                    )
-                }))
+            project.extensions.getByType(JavaPluginExtension::class.java).sourceSets.named("main") { sourceSet ->
+                sourceSet.java.srcDir(extractTask.flatMap { it.outputDirectory })
+            }
+
+            project.tasks.named("compileJava") { it.dependsOn(extractTask) }
         }
+    }
 
-        project.tasks.named("compileJava") { it.dependsOn(project.tasks.named("prepareHytaleClasspath")) }
+    private fun registerHytaleClasspath(
+        project: Project,
+        extension: HyBuildExtension,
+        hytaleDir: Directory,
+        versionProvider: Provider<String>
+    ) {
+        project.plugins.withId("java") {
+            project.plugins.apply("io.freefair.lombok")
 
-        project.repositories.mavenLocal()
+            val extractServerZipTask =
+                project.tasks.named("extractServerZip", ExtractServerZipTask::class.java)
 
-        project.configurations.getByName("compileOnly").withDependencies { deps ->
-            val javadoc = extension.includeAIJavadoc.get()
-            val ver = versionProvider.orNull
-
-            if (javadoc && !ver.isNullOrBlank()) {
-                deps.add(
-                    project.dependencies.create(
-                        "${HytaleVersionSource.HYTALE_GROUP}:${HytaleVersionSource.HYTALE_ARTIFACT}:$ver"
-                    )
+            project.tasks.register(
+                "prepareHytaleClasspath",
+                PrepareHytaleClasspathTask::class.java
+            ) {
+                it.group = "hytale project"
+                it.description =
+                    "Extracts the AI-generated javadoc JAR and installs Hytale Server to Maven Local"
+                it.includeAIJavadoc.set(extension.includeAIJavadoc)
+                it.version.set(versionProvider)
+                it.serverJar.set(extractServerZipTask.flatMap { t -> t.serverJar })
+                it.extractedJavadocJar.set(hytaleDir.file("HytaleServer-javadoc.jar"))
+                it.mavenLocalArtifactDir.set(
+                    project.layout.dir(
+                        versionProvider.map { ver ->
+                            File(
+                                System.getProperty("user.home"),
+                                ".m2/repository/${
+                                    HytaleVersionSource.HYTALE_GROUP.replace(
+                                        '.',
+                                        '/'
+                                    )
+                                }/${HytaleVersionSource.HYTALE_ARTIFACT}/$ver"
+                            )
+                        })
                 )
-            } else {
-                deps.add(project.dependencies.create(project.files(hytaleDir.file("HytaleServer.jar"))))
+            }
+
+            project.tasks.named("compileJava") { it.dependsOn(project.tasks.named("prepareHytaleClasspath")) }
+
+            project.repositories.mavenLocal()
+
+            project.configurations.getByName("compileOnly").withDependencies { deps ->
+                val javadoc = extension.includeAIJavadoc.get()
+                val ver = versionProvider.orNull
+
+                if (javadoc && !ver.isNullOrBlank()) {
+                    deps.add(
+                        project.dependencies.create(
+                            "${HytaleVersionSource.HYTALE_GROUP}:${HytaleVersionSource.HYTALE_ARTIFACT}:$ver"
+                        )
+                    )
+                } else {
+                    deps.add(project.dependencies.create(project.files(hytaleDir.file("HytaleServer.jar"))))
+                }
             }
         }
     }

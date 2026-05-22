@@ -1,12 +1,15 @@
-package net.esieben.hybuild
+package net.esieben.hybuild.project
 
+import net.esieben.hybuild.HytaleVersionSource
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 
+@DisableCachingByDefault(because = "Installs artifacts to Maven Local — a shared mutable store that cannot be safely shared across builds")
 abstract class PrepareHytaleClasspathTask : DefaultTask() {
 
     @get:Input
@@ -18,6 +21,7 @@ abstract class PrepareHytaleClasspathTask : DefaultTask() {
 
     @get:InputFile
     @get:Optional
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val serverJar: RegularFileProperty
 
     @get:OutputFile

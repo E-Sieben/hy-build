@@ -10,7 +10,9 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
+import org.gradle.work.DisableCachingByDefault
 
+@DisableCachingByDefault(because = "Writes manifest.json into the project source tree, not the build directory")
 abstract class AbstractManifestTask : DefaultTask() {
 
     @get:Internal

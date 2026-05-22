@@ -14,9 +14,42 @@ plugins {
 ```
 
 The plugin automatically applies [Lombok](https://projectlombok.org/) and adds `HytaleServer.jar` as
-a `compileOnly` dependency whenever the `java` plugin is present. AI-generated Javadoc is attached to
+a `compileOnly` dependency whenever the `java` plugin is present. AI-generated Javadoc is attached
+to
 `HytaleServer.jar` by default, so hovering over any Hytale API in your IDE shows documentation.
 ([Click here to disable](https://github.com/E-Sieben/hy-build#ai-javadoc))
+
+## Codec Helpers
+
+The plugin ships a set of helper classes that eliminate the boilerplate of Hytale's codec system.
+They are extracted into your project's build directory automatically — no additional dependency
+required.
+
+```java
+import net.esieben.hybuild.codec.SimpleBuilderCodec;
+import net.esieben.hybuild.codec.Types;
+import net.esieben.hybuild.codec.MathTypes;
+
+@Data
+public class MyConfig {
+
+  public static final BuilderCodec<MyConfig> CODEC =
+      SimpleBuilderCodec.of(MyConfig.class, MyConfig::new)
+          .append("Name", Types.STRING, MyConfig::setName, MyConfig::getName)
+          .append("Damage", Types.INTEGER, MyConfig::setDamage, MyConfig::getDamage)
+          .append("Position", MathTypes.VECTOR_3D, MyConfig::setPosition, MyConfig::getPosition)
+          .build();
+
+  String name = "default";
+  int damage = 10;
+  Vector3d position = new Vector3d(0, 64, 0);
+}
+```
+
+For the complete type reference, every supported JSON format, and a full worked example, see
+[CODEC.md](CODEC.md).
+
+---
 
 ## Configuration
 
@@ -30,6 +63,7 @@ hytale {
   includeAIJavadoc = false                // optional, default: true
 }
 ```
+
 The `Group`, `Name`, `Version`, `Main`, and `ServerVersion` fields in the manifest are derived
 automatically from your Gradle project — you only need to supply what Gradle doesn't already know.
 
@@ -220,16 +254,19 @@ hytale {
 That's it. `Main` is derived as `com.example.YourPlugin` and `ServerVersion` is read from the
 downloaded server zip automatically.
 
-
 # Roadmap
+
 *Planned*:
+
 - Linux, Mac and Windows dedicated Integration Test Suite via GitHub Runners
 - Dedicated Pre-Release Pipeline
 - Easy Version Management probably via Google's Release Please
 - Server Error detection
 
 *Not planned*:
+
 - Release of the AI Flow to document the Source Code
-  - (AI is a plight upon Humanity and the Moment we get *proper* accessible Human documented code this feature
-  will be flagged as deprecated)
+  - (AI is a plight upon Humanity and the Moment we get *proper* accessible Human documented code
+    this feature
+    will be flagged as deprecated)
 - Dynamic Links to hytalemodding.dev

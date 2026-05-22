@@ -1,8 +1,10 @@
 package net.esieben.hybuild.project
 
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.time.LocalDate
 
+@DisableCachingByDefault(because = "Generates source files into the project source tree, not the build directory")
 abstract class InitializeProjectTask : AbstractManifestTask() {
 
     @TaskAction

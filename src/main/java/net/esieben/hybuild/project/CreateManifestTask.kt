@@ -4,7 +4,9 @@ import groovy.json.JsonOutput
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 
+@DisableCachingByDefault(because = "Writes manifest.json into the project source tree, not the build directory")
 abstract class CreateManifestTask : AbstractManifestTask() {
 
     @get:OutputFile

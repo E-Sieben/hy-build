@@ -7,11 +7,13 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.zip.ZipInputStream
 
+@DisableCachingByDefault(because = "Extracts server files into .hytale/ in the project root, not the build directory")
 abstract class ExtractServerZipTask : DefaultTask() {
 
     companion object {
@@ -55,10 +57,10 @@ abstract class ExtractServerZipTask : DefaultTask() {
             while (entry != null) {
                 if (!entry.isDirectory) {
                     val target: File? = when (File(entry.name).name) {
-                        "Assets.zip"       -> assetsZip.get().asFile
+                        "Assets.zip" -> assetsZip.get().asFile
                         "HytaleServer.jar" -> serverJar.get().asFile
                         "HytaleServer.aot" -> serverAot.get().asFile
-                        else               -> null
+                        else -> null
                     }
                     if (target != null) {
                         logger.lifecycle("  Extracting '${entry.name}' → '${target.name}'")

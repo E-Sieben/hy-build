@@ -6,12 +6,14 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.net.URI
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.zip.ZipInputStream
 
+@DisableCachingByDefault(because = "Downloads from the network — output is non-deterministic and goes to the source tree")
 abstract class DownloadServerDownloaderTask : DefaultTask() {
     companion object {
         val DOWNLOADER_URL: URL =

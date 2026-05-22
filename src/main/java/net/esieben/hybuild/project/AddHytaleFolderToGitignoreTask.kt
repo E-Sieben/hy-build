@@ -5,8 +5,10 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 
+@DisableCachingByDefault(because = "Modifies .gitignore in the project source tree — not safe to cache across machines")
 abstract class AddHytaleFolderToGitignoreTask : DefaultTask() {
 
     companion object {
